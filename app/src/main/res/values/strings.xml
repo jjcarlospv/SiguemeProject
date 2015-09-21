@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">SiguemeProject</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Strings for Navigation Drawer List-->
+    <string name="nav_item_new_route">CREAR RUTA</string>
+    <string name="nav_item_see_route">VER RUTAS</string>
+    <string name="nav_item_erase_route">ELIMINAR RUTA</string>
+
+    <string-array name="nav_labels">
+        <item>@string/nav_item_new_route</item>
+        <item>@string/nav_item_see_route</item>
+        <item>@string/nav_item_erase_route</item>
+    </string-array>
+
+</resources>

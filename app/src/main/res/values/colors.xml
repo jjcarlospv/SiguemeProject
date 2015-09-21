@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="sky_blue_light">#D7DEE7</color>
+    <color name="sky_blue">#DCDEE3</color>
+    <color name="sky_blue_forte">#BBD4FA</color>
+
+
+
+    <color name="sky_blue_middle">#6F8CD1</color>
+    <color name="blue_light">#567AB8</color>
+    <color name="blue_middlelight">#3A5A98</color>
+    <color name="blue">#3A5897</color>
+    <color name="blue_semiforte">#3B5994</color>
+    <color name="blue_forte">#293C65</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="yellow_forte">#FCCA00</color>
+
+</resources>
