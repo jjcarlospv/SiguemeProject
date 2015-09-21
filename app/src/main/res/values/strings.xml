@@ -4,6 +4,56 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+
+    <!-- String for Main Activity -->
+    <string name="main_activity_exit_message">¿Desea cancelar el servicio de localización?</string>
+    <string name="main_activity_exit_message_btn_negative">NO</string>
+    <string name="main_activity_exit_message_btn_positive">SI</string>
+    <string name="main_activity_service_continue">Localizacion Activa</string>
+    <string name="main_activity_service_cancel">Servicio Cancelado</string>
+    <string name="main_activity_start_service">Iniciando Servicio</string>
+    <string name="main_activity_error_gps">Activar GPS</string>
+
+    <!-- String for Fragment List -->
+    <string name="fragment_list_btn_name_create">CREAR RUTA</string>
+    <string name="fragment_list_btn_name_list">VER RUTAS</string>
+    <string name="fragment_list_btn_name_eliminate">ELIMINAR RUTA</string>
+    <string name="fragment_list_btn_name_watch_map">VER MAPA</string>
+
+    <!-- String for Dialog Create Route -->
+    <string name="dialog_create_route_title">Datos de Ruta</string>
+    <string name="dialog_create_route_name">NOMBRE:</string>
+    <string name="dialog_create_route_description">DESCRIPCION:</string>
+    <string name="dialog_create_route_btn_cancel">CANCELAR</string>
+    <string name="dialog_create_route_btn_ok">ACEPTAR</string>
+    <string name="dialog_create_route_type_name">Ingresar Nombre de Ruta</string>
+
+    <!-- String for Dialog Eliminate Route -->
+    <string name="dialog_eliminate_route_title">¿Desea eliminar la ruta seleccionada?</string>
+    <string name="dialog_eliminate_route_btn_no">NO</string>
+    <string name="dialog_eliminate_route_btn_yes">SI</string>
+
+    <!-- String for Fragment Position -->
+    <string name="fragment_content_txt_name_location">LOCATION</string>
+    <string name="fragment_content_txt_info">LATITUDE // LONGITUDE</string>
+
+    <!--String Fragment Options -->
+    <string name="fragment_options_start">INICIAR RUTA</string>
+    <string name="fragment_options_list">VER LISTA</string>
+    <string name="fragment_options_cancel">CANCELAR RUTA</string>
+
+    <!--String Fragment List Route -->
+    <string name="fragment_list_routes_title">LISTA DE RUTAS</string>
+
+    <!-- String for Item Position-->
+    <string name="item_position_latitude">LAT: %s</string>
+    <string name="item_position_longitude">LNG: %s</string>
+    <string name="item_position_date">DATE: %s</string>
+    <string name="item_position_hour">HOUR: %s</string>
+
+    <!--Deben reeemplazar este valor con la llave del API-->
+    <string name="maps_api_key">AIzaSyCpzTpxpVIyh6CVdvBWs0VL29QWp6w8uNU</string>
+
     <!-- Strings for Navigation Drawer List-->
     <string name="nav_item_new_route">CREAR RUTA</string>
     <string name="nav_item_see_route">VER RUTAS</string>
@@ -14,5 +64,6 @@
         <item>@string/nav_item_see_route</item>
         <item>@string/nav_item_erase_route</item>
     </string-array>
+
 
 </resources>
