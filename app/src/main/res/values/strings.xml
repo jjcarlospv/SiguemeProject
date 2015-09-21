@@ -52,7 +52,7 @@
     <string name="item_position_hour">HOUR: %s</string>
 
     <!--Deben reeemplazar este valor con la llave del API-->
-    <string name="maps_api_key">AIzaSyCpzTpxpVIyh6CVdvBWs0VL29QWp6w8uNU</string>
+    <string name="maps_api_key">AIzaSyDqwbnao9R7SlN1eV6fS-HrXUvuOCssKOE</string>
 
     <!-- Strings for Navigation Drawer List-->
     <string name="nav_item_new_route">CREAR RUTA</string>
