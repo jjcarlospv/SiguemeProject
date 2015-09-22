@@ -29,7 +29,6 @@
         <provider
             android:name=".provider.PositionContentProvider"
             android:authorities="com.projects.jeancarlos.siguemeproject.PositionContentProvider">
-
         </provider>
 
 
