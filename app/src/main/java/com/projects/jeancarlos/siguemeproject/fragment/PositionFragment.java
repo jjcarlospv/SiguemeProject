@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.SupportMapFragment;
 import com.projects.jeancarlos.siguemeproject.R;
 import com.projects.jeancarlos.siguemeproject.service.PositionService;
 
@@ -36,10 +37,18 @@ public class PositionFragment extends Fragment {
 
         mapFragment = new MapFragment();
         //mapFragment.setMapFragmentInterface(this);
-        getFragmentManager()
+      /*  getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_position_place_holder, mapFragment)
-                .commit();
+                .commit();*/
+        getChildFragmentManager().findFragmentById(R.id.fragment_position_place_holder);
+        //mMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getFragmentManager().beginTransaction().remove(mapFragment);
     }
 
     @Override
