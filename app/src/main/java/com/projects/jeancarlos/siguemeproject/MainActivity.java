@@ -1,6 +1,7 @@
 package com.projects.jeancarlos.siguemeproject;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,11 +11,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.projects.jeancarlos.siguemeproject.database.DataBaseManager;
 import com.projects.jeancarlos.siguemeproject.dialog.CreateRouteDialog;
+import com.projects.jeancarlos.siguemeproject.dialog.EliminateRouteDialog;
 import com.projects.jeancarlos.siguemeproject.fragment.ContentFragment;
 import com.projects.jeancarlos.siguemeproject.fragment.DescriptionMaskFragment;
 import com.projects.jeancarlos.siguemeproject.fragment.NavigationDrawerFragment;
+import com.projects.jeancarlos.siguemeproject.provider.PositionContentProvider;
+import com.projects.jeancarlos.siguemeproject.service.PositionService;
+import com.projects.jeancarlos.siguemeproject.util.DateUtil;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
@@ -30,6 +38,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public final static String FRAGMENT_MASK_OPTIONS = "3";
     public final static String FRAGMENT_OPTIONS = "4";
     public final static String FRAGMENT_POSITION = "5";
+    public final static String FRAGMENT_LIST_POSITIONS = "6";
     public final static String FRAGMENT_ROUTE_IN_PROCESS = "I";
     public final static String FRAGMENT_ROUTE_NONE = "N";
 
@@ -41,6 +50,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private NavigationDrawerFragment drawerFragment;
 
     private ContentFragment contentFragment;
+    public DateFormat df;
 
 
     @Override
@@ -52,6 +62,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
         drawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
@@ -65,16 +76,14 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
             case 0:
                 firstOption();
-                Toast.makeText(MainActivity.this,"0",Toast.LENGTH_SHORT).show();
-
                 break;
 
             case 1:
-                Toast.makeText(MainActivity.this,"1",Toast.LENGTH_SHORT).show();
+                secondOption();
                 break;
 
             case 2:
-                Toast.makeText(MainActivity.this,"2",Toast.LENGTH_SHORT).show();
+                thirdOption();
                 break;
 
         }
@@ -92,19 +101,20 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
                 if (i == 1) {
                     createRouteDialog.dismiss();
-                    SAVE_FRAGMENT_DESCRIPTION = FRAGMENT_MASK_DESCRIPTION;
-                    SAVE_FRAGMENT_OPTIONS = FRAGMENT_OPTIONS;
 
-                    /*String date = df.format(Calendar.getInstance().getTime());
+
+                    String date = df.format(Calendar.getInstance().getTime());
 
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(DataBaseManager.NAME, nameRoute);
                     contentValues.put(DataBaseManager.DESCRIPTION, description);
                     contentValues.put(DataBaseManager.DATE_BEGIN, DateUtil.getDate(date));
                     contentValues.put(DataBaseManager.HOUR_BEGIN, DateUtil.getHour(date));
+                    getContentResolver().insert(PositionContentProvider.URI_ROUTE, contentValues);
 
-                    getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE,MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME,nameRoute).commit();*/
-
+                    getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE,MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME,nameRoute).commit();
+                    getSharedPreferences(SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,FRAGMENT_MASK_DESCRIPTION).commit();
+                    getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_OPTIONS).commit();
 
                     contentFragment = new ContentFragment();
                     getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
@@ -112,4 +122,30 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             }
         });
     }
+
+    private void secondOption(){
+
+        getSharedPreferences(SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,FRAGMENT_LIST_ROUTES).commit();
+        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_MASK_OPTIONS).commit();
+
+        contentFragment = new ContentFragment();
+        getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
+    }
+
+    private void thirdOption(){
+        final EliminateRouteDialog eliminateRouteDialog = new EliminateRouteDialog(MainActivity.this);
+        eliminateRouteDialog.show();
+        eliminateRouteDialog.setInterfaceEliminateDialog(new EliminateRouteDialog.InterfaceEliminateDialog() {
+            @Override
+            public void closeDialogEliminate(int i) {
+                if (i == 0) {
+                    eliminateRouteDialog.dismiss();
+                }
+                if (i == 1) {
+                    eliminateRouteDialog.dismiss();
+                }
+            }
+        });
+    }
+
 }

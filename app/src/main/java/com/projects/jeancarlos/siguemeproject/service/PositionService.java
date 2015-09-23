@@ -73,7 +73,7 @@ public class PositionService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
         RouteName = getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(SHARE_PREF_KEY_ROUTE_NAME, null);
     }
 
@@ -98,7 +98,7 @@ public class PositionService extends Service implements LocationListener {
             @Override
             public void run() {
                 stopListenerLocation();
-                getLocatioHandler.removeCallbacks(endServiceRunnable);
+                //getLocatioHandler.removeCallbacks(endServiceRunnable);
                 Log.e("GetLoc", "End");
                 sampleHandler.postDelayed(sampleRunnable, SAMPLE_TIME);
             }
@@ -108,26 +108,22 @@ public class PositionService extends Service implements LocationListener {
         sampleRunnable = new Runnable() {
             @Override
             public void run() {
-                if (status == true) {
                     startListenerLocation();
-                    sampleHandler.removeCallbacks(sampleRunnable);
+                    //sampleHandler.removeCallbacks(sampleRunnable);
                     Log.e("SampleLoc", "End");
                     getLocatioHandler.postDelayed(endServiceRunnable, GET_LOCATION_TIME);
-                }
             }
         };
 
         getLocatioHandler.postDelayed(endServiceRunnable, GET_LOCATION_TIME);
 
-
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopListenerLocation();
-        status = false;
+
         init_location = 0;
 
 
@@ -146,14 +142,16 @@ public class PositionService extends Service implements LocationListener {
      */
 
     private void startListenerLocation() {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, this);
-        status = true;
     }
 
     private void stopListenerLocation() {
         locationManager.removeUpdates(PositionService.this);
+        if(locationManager != null)
+        {locationManager = null;}
     }
 
     /*private boolean isBetterPosition(Location location, Location lastBestPosition) {

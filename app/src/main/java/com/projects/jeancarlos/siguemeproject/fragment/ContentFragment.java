@@ -2,8 +2,10 @@ package com.projects.jeancarlos.siguemeproject.fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.IntentService;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import com.projects.jeancarlos.siguemeproject.MainActivity;
 import com.projects.jeancarlos.siguemeproject.R;
+import com.projects.jeancarlos.siguemeproject.service.PositionService;
 
 /**
  * Created by JEANCARLOS on 20/09/2015.
@@ -25,6 +28,10 @@ public class ContentFragment extends Fragment {
     private OptionsFragment optionsFragment;
     private DescriptionMaskFragment descriptionMaskFragment;
     private PositionFragment positionFragment;
+    private ListPositionFragment listPositionFragment;
+    private OptionMaskFragment optionMaskFragment;
+    private ListRoutesFragment listRoutesFragment;
+    private Intent intentService;
 
     @Nullable
     @Override
@@ -36,29 +43,91 @@ public class ContentFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         fragment_options_Type = getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).getString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_MASK_OPTIONS);
         fragment_description_Type = getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).getString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,MainActivity.FRAGMENT_MASK_DESCRIPTION);
 
-        optionsFragment = new OptionsFragment();
+        switch(fragment_description_Type)
+        {
+            case MainActivity.FRAGMENT_MASK_DESCRIPTION:
+                fragmentMaskDescription();
+                break;
+
+            case MainActivity.FRAGMENT_POSITION:
+                fragmentPosition();
+                break;
+
+            case MainActivity.FRAGMENT_LIST_ROUTES:
+                fragmentListRoute();
+                break;
+        }
+
+        switch(fragment_options_Type){
+
+            case MainActivity.FRAGMENT_MASK_OPTIONS:
+                fragmentMaskOption();
+                break;
+
+            case MainActivity.FRAGMENT_OPTIONS:
+                fragmentOptions();
+                break;
+        }
+    }
+
+    private void fragmentMaskDescription(){
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,MainActivity.FRAGMENT_MASK_DESCRIPTION).commit();
         descriptionMaskFragment = new DescriptionMaskFragment();
-        getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, descriptionMaskFragment).commit();
+        getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description,descriptionMaskFragment).commit();
+
+    }
+
+    private void fragmentPosition(){
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_POSITION).commit();
+        positionFragment = new PositionFragment();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, positionFragment).commit();
+    }
+
+    private void fragmentListRoute(){
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_LIST_ROUTES).commit();
+        listRoutesFragment = new ListRoutesFragment();
+        getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description,listRoutesFragment).commit();
+    }
+
+    private void fragmentListPosition(){
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_LIST_POSITIONS).commit();
+        listPositionFragment = new ListPositionFragment();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, listPositionFragment).commit();
+    }
+
+    private void fragmentMaskOption(){
+
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_MASK_OPTIONS).commit();
+
+        optionMaskFragment = new OptionMaskFragment();
+        getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_options, optionMaskFragment).commit();
+    }
+
+    private void fragmentOptions(){
+
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_OPTIONS).commit();
+
+        optionsFragment = new OptionsFragment();
         getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_options, optionsFragment).commit();
 
+        final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        intentService = new Intent(getActivity(), PositionService.class);
         optionsFragment.setInterfaceOptions(new OptionsFragment.InterfaceOptions() {
             @Override
             public void getOption(int i) {
 
                 if (i == 0) {
 
-                    final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
                     if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                        positionFragment = new PositionFragment();
-                        getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, positionFragment).commit();
 
-                        //SAVE_FRAGMENT_DESCRIPTION = FRAGMENT_POSITION;
-                        //SAVE_FRAGMENT_OPTIONS = FRAGMENT_OPTIONS;
-                        //startService(intentService);
+                        fragmentPosition();
+                        getActivity().startService(intentService);
+
                         Toast.makeText(getActivity(), R.string.main_activity_start_service, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getActivity(), R.string.main_activity_error_gps, Toast.LENGTH_SHORT).show();
@@ -67,8 +136,7 @@ public class ContentFragment extends Fragment {
                 }
 
                 if (i == 1) {
-                    //listPositionFragment = new ListPositionFragment();
-                    //getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, listPositionFragment).commit();
+                    fragmentListPosition();
                 }
 
                 if (i == 2) {
@@ -78,7 +146,7 @@ public class ContentFragment extends Fragment {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
-                                    //stopService(intentService);
+                                    getActivity().stopService(intentService);
                                 }
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -93,4 +161,5 @@ public class ContentFragment extends Fragment {
             }
         });
     }
+
 }

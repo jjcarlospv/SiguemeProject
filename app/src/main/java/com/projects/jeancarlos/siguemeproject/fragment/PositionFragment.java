@@ -37,11 +37,12 @@ public class PositionFragment extends Fragment {
 
         mapFragment = new MapFragment();
         //mapFragment.setMapFragmentInterface(this);
-      /*  getFragmentManager()
+
+        getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_position_place_holder, mapFragment)
-                .commit();*/
-        getChildFragmentManager().findFragmentById(R.id.fragment_position_place_holder);
+                .commit();
+       // getChildFragmentManager().findFragmentById(R.id.fragment_position_place_holder);
         //mMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
     }
 
