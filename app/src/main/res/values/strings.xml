@@ -13,6 +13,8 @@
     <string name="main_activity_service_cancel">Servicio Cancelado</string>
     <string name="main_activity_start_service">Iniciando Servicio</string>
     <string name="main_activity_error_gps">Activar GPS</string>
+    <string name="main_activity_error_route">Ruta en curso</string>
+    <string name="main_activity_continue_route">Retomando el recorrido</string>
 
     <!-- String for Fragment List -->
     <string name="fragment_list_btn_name_create">CREAR RUTA</string>
@@ -45,11 +47,16 @@
     <!--String Fragment List Route -->
     <string name="fragment_list_routes_title">LISTA DE RUTAS</string>
 
+    <!--String Fragment Close Routes -->
+    <string name="fragment_close_routes_close">CERRAR RUTAS</string>
+
     <!-- String for Item Position-->
     <string name="item_position_latitude">LAT: %s</string>
     <string name="item_position_longitude">LNG: %s</string>
     <string name="item_position_date">DATE: %s</string>
     <string name="item_position_hour">HOUR: %s</string>
+
+
 
     <!--Deben reeemplazar este valor con la llave del API-->
     <string name="maps_api_key">AIzaSyDqwbnao9R7SlN1eV6fS-HrXUvuOCssKOE</string>

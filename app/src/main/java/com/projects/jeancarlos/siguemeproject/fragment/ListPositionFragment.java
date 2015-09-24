@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import com.projects.jeancarlos.siguemeproject.R;
 import com.projects.jeancarlos.siguemeproject.adapter.PositionAdapter;
+import com.projects.jeancarlos.siguemeproject.database.DataBaseManager;
 import com.projects.jeancarlos.siguemeproject.model.Position_DTO;
 import com.projects.jeancarlos.siguemeproject.provider.PositionContentProvider;
+import com.projects.jeancarlos.siguemeproject.service.PositionService;
 
 import java.util.ArrayList;
 
@@ -36,7 +38,9 @@ public class ListPositionFragment extends Fragment {
 
         listPositionItems = new ArrayList<Position_DTO>();
 
-        final Cursor cursor = getActivity().getContentResolver().query(PositionContentProvider.URI_POSITION, null, null, null, null);
+        String tempNameRoute = getActivity().getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, getActivity().MODE_PRIVATE).getString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, PositionService.SHARE_PREF_KEY_ROUTE_NULL);
+
+        final Cursor cursor = getActivity().getContentResolver().query(PositionContentProvider.URI_POSITION, null, DataBaseManager.ID_ROUTE +"=?", new String[]{tempNameRoute}, null);
 
         while(cursor.moveToNext()){
 

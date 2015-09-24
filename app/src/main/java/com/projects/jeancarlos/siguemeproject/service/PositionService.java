@@ -45,6 +45,7 @@ public class PositionService extends Service implements LocationListener {
     public static final String SHARE_PREF_KEY_SERV_STOPPED = "Stopped";
     public static final String SHARE_PREF_KEY_SERV_IN_PROGRESS = "inProgress";
     public static final String SHARE_PREF_KEY_ROUTE_NAME = "RouteName";
+    public static final String SHARE_PREF_KEY_ROUTE_NULL = "RouteNameNull";
 
     private String RouteName;
 
@@ -59,7 +60,7 @@ public class PositionService extends Service implements LocationListener {
     private static final long MIN_TIME_UPDATE = 1000 * 30;
     private LocationManager locationManager;
 
-    private static final int GET_LOCATION_TIME = 2000;
+    private static final int GET_LOCATION_TIME = 5000;
     private static final int SAMPLE_TIME = 5000;
 
     private static boolean status;
@@ -73,8 +74,7 @@ public class PositionService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
 
-
-        RouteName = getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(SHARE_PREF_KEY_ROUTE_NAME, null);
+        RouteName = getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(SHARE_PREF_KEY_ROUTE_NAME, SHARE_PREF_KEY_ROUTE_NULL);
     }
 
     @Override
@@ -91,6 +91,8 @@ public class PositionService extends Service implements LocationListener {
         getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE)
                 .edit().putString(SHARE_PREF_KEY_SERV_STATUS, SHARE_PREF_KEY_SERV_IN_PROGRESS)
                 .commit();
+
+        Log.e("POSITION_SERVICE", "Start");
 
 
         getLocatioHandler = new Handler();
@@ -125,7 +127,7 @@ public class PositionService extends Service implements LocationListener {
         super.onDestroy();
 
         init_location = 0;
-
+        stopListenerLocation();
 
         getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE)
                 .edit().putString(SHARE_PREF_KEY_SERV_STATUS, SHARE_PREF_KEY_SERV_STOPPED)
@@ -142,6 +144,7 @@ public class PositionService extends Service implements LocationListener {
      */
 
     private void startListenerLocation() {
+        locationManager = null;
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
@@ -150,8 +153,9 @@ public class PositionService extends Service implements LocationListener {
 
     private void stopListenerLocation() {
         locationManager.removeUpdates(PositionService.this);
-        if(locationManager != null)
-        {locationManager = null;}
+
+        //if(locationManager != null)
+        //{locationManager = null;}
     }
 
     /*private boolean isBetterPosition(Location location, Location lastBestPosition) {
@@ -247,7 +251,7 @@ public class PositionService extends Service implements LocationListener {
                 delta_latitude = delta_latitude * -1;
             }
 
-            if ((delta_longitude > 1.3E-4) || (delta_latitude > 1.3E-4)) //Establecemos un delta referencial
+            if ((delta_longitude > 1.2E-4) || (delta_latitude > 1.2E-4)) //Establecemos un delta referencial
             {
                 location_old = location;
                 location_old.setLatitude(latitude);
@@ -257,28 +261,28 @@ public class PositionService extends Service implements LocationListener {
         }
     }
 
-
     private void savePosition(Location location) {
 
-        String date = df.format(Calendar.getInstance().getTime());
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DataBaseManager.ADDRESS, "");
-        contentValues.put(DataBaseManager.LATITUD, String.valueOf(location.getLatitude()));
-        contentValues.put(DataBaseManager.LONGITUD, String.valueOf(location.getLongitude()));
-        contentValues.put(DataBaseManager.DATE, String.valueOf(DateUtil.getDate(date)));
-        contentValues.put(DataBaseManager.HOUR, String.valueOf(DateUtil.getHour(date)));
-        contentValues.put(DataBaseManager.ID_ROUTE, RouteName);
-        Uri uri = getContentResolver().insert(PositionContentProvider.URI_POSITION, contentValues);
+            String date = df.format(Calendar.getInstance().getTime());
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DataBaseManager.ADDRESS, "");
+            contentValues.put(DataBaseManager.LATITUD, String.valueOf(location.getLatitude()));
+            contentValues.put(DataBaseManager.LONGITUD, String.valueOf(location.getLongitude()));
+            contentValues.put(DataBaseManager.DATE, String.valueOf(DateUtil.getDate(date)));
+            contentValues.put(DataBaseManager.HOUR, String.valueOf(DateUtil.getHour(date)));
+            contentValues.put(DataBaseManager.ID_ROUTE, RouteName);
+            Uri uri = getContentResolver().insert(PositionContentProvider.URI_POSITION, contentValues);
 
-        Intent intentTestService = new Intent(POSITION_ACTION);
-        intentTestService.putExtra(PROGRESS_LATITUDE, String.valueOf(location.getLatitude()));
-        intentTestService.putExtra(PROGRESS_LONGITUDE, String.valueOf(location.getLongitude()));
-        intentTestService.putExtra(PROGRESS_DATE, String.valueOf(DateUtil.getDate(date)));
-        intentTestService.putExtra(PROGRESS_HOUR, String.valueOf(DateUtil.getHour(date)));
-        intentTestService.putExtra(PROGRESS_ROUTE, RouteName);
-        intentTestService.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);
-        sendBroadcast(intentTestService);
-        Log.e("SAVE_POSITION", String.valueOf(location.getLatitude()) + "//" + String.valueOf(location.getLongitude()));
+            Intent intentTestService = new Intent(POSITION_ACTION);
+            intentTestService.putExtra(PROGRESS_LATITUDE, String.valueOf(location.getLatitude()));
+            intentTestService.putExtra(PROGRESS_LONGITUDE, String.valueOf(location.getLongitude()));
+            intentTestService.putExtra(PROGRESS_DATE, String.valueOf(DateUtil.getDate(date)));
+            intentTestService.putExtra(PROGRESS_HOUR, String.valueOf(DateUtil.getHour(date)));
+            intentTestService.putExtra(PROGRESS_ROUTE, RouteName);
+            intentTestService.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);
+            sendBroadcast(intentTestService);
+            Log.e("SAVE_POSITION", String.valueOf(location.getLatitude()) + "//" + String.valueOf(location.getLongitude()));
+
     }
 
     @Override

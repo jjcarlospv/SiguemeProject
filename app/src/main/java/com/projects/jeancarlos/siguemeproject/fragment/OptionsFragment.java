@@ -54,8 +54,12 @@ public class OptionsFragment extends Fragment implements View.OnClickListener {
                 interfaceOptions.getOption(1);
                 break;
 
-            case R.id.fragment_option_cancel:
+            /*case R.id.fragment_option_pause:
                 interfaceOptions.getOption(2);
+                break;*/
+
+            case R.id.fragment_option_cancel:
+                interfaceOptions.getOption(3);
                 break;
         }
     }

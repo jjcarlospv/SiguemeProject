@@ -39,6 +39,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public final static String FRAGMENT_OPTIONS = "4";
     public final static String FRAGMENT_POSITION = "5";
     public final static String FRAGMENT_LIST_POSITIONS = "6";
+    public final static String FRAGMENT_CLOSE_ROUTES = "7";
     public final static String FRAGMENT_ROUTE_IN_PROCESS = "I";
     public final static String FRAGMENT_ROUTE_NONE = "N";
 
@@ -67,6 +68,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         drawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
         drawerFragment.setDrawerListener(this);
+
+        contentFragment = new ContentFragment();
+        getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
     }
 
     @Override
@@ -89,44 +93,52 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     }
 
-    private void firstOption(){
-        final CreateRouteDialog createRouteDialog = new CreateRouteDialog(MainActivity.this);
-        createRouteDialog.show();
-        createRouteDialog.setInterfaceDialogRoute(new CreateRouteDialog.InterfaceDialogRoute() {
-            @Override
-            public void closeDialogRoute(int i, String nameRoute, String description) {
-                if (i == 0) {
-                    createRouteDialog.dismiss();
+    private void firstOption() {
+
+        String tempNameRoute = getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, PositionService.SHARE_PREF_KEY_ROUTE_NULL);
+        if (tempNameRoute == PositionService.SHARE_PREF_KEY_ROUTE_NULL) {
+            final CreateRouteDialog createRouteDialog = new CreateRouteDialog(MainActivity.this);
+            createRouteDialog.show();
+            createRouteDialog.setInterfaceDialogRoute(new CreateRouteDialog.InterfaceDialogRoute() {
+                @Override
+                public void closeDialogRoute(int i, String nameRoute, String description) {
+                    if (i == 0) {
+                        createRouteDialog.dismiss();
+                    }
+
+                    if (i == 1) {
+                        createRouteDialog.dismiss();
+
+
+                        String date = df.format(Calendar.getInstance().getTime());
+
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(DataBaseManager.NAME, nameRoute);
+                        contentValues.put(DataBaseManager.DESCRIPTION, description);
+                        contentValues.put(DataBaseManager.DATE_BEGIN, DateUtil.getDate(date));
+                        contentValues.put(DataBaseManager.HOUR_BEGIN, DateUtil.getHour(date));
+                        getContentResolver().insert(PositionContentProvider.URI_ROUTE, contentValues);
+
+                        getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, nameRoute).commit();
+                        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, FRAGMENT_MASK_DESCRIPTION).commit();
+                        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_OPTIONS).commit();
+
+                        contentFragment = new ContentFragment();
+                        getFragmentManager().beginTransaction().replace(R.id.activity_main_container, contentFragment).commit();
+                    }
                 }
+            });
+        }
 
-                if (i == 1) {
-                    createRouteDialog.dismiss();
-
-
-                    String date = df.format(Calendar.getInstance().getTime());
-
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(DataBaseManager.NAME, nameRoute);
-                    contentValues.put(DataBaseManager.DESCRIPTION, description);
-                    contentValues.put(DataBaseManager.DATE_BEGIN, DateUtil.getDate(date));
-                    contentValues.put(DataBaseManager.HOUR_BEGIN, DateUtil.getHour(date));
-                    getContentResolver().insert(PositionContentProvider.URI_ROUTE, contentValues);
-
-                    getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE,MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME,nameRoute).commit();
-                    getSharedPreferences(SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,FRAGMENT_MASK_DESCRIPTION).commit();
-                    getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_OPTIONS).commit();
-
-                    contentFragment = new ContentFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
-                }
-            }
-        });
+        else{
+            Toast.makeText(getApplication(),R.string.main_activity_error_route,Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void secondOption(){
 
         getSharedPreferences(SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,FRAGMENT_LIST_ROUTES).commit();
-        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_MASK_OPTIONS).commit();
+        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_CLOSE_ROUTES).commit();
 
         contentFragment = new ContentFragment();
         getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
