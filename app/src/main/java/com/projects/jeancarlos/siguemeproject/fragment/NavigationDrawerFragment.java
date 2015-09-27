@@ -171,10 +171,10 @@ public class NavigationDrawerFragment extends Fragment {
         btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mDrawerLayout.isDrawerOpen(Gravity.RIGHT)){
-                    mDrawerLayout.closeDrawer(Gravity.RIGHT);
+                if(mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
                 }else{
-                    mDrawerLayout.openDrawer(Gravity.RIGHT);
+                    mDrawerLayout.openDrawer(Gravity.LEFT);
                 }
             }
         });

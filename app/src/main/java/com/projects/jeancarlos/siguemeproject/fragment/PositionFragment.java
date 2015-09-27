@@ -6,14 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.projects.jeancarlos.siguemeproject.R;
 import com.projects.jeancarlos.siguemeproject.adapter.PositionAdapter;
 import com.projects.jeancarlos.siguemeproject.database.DataBaseManager;
@@ -34,12 +39,12 @@ public class PositionFragment extends Fragment {
     private String tempLat;
     private String tempLng;
 
+    private LatLng latLng_old;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_position, container, false);
-
-
 
         listPositionItems = new ArrayList<Position_DTO>();
 
@@ -69,7 +74,7 @@ public class PositionFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        Log.e("PositFrag", "onActivityCreated");
         mapFragment = new MapFragment();
         //mapFragment.setMapFragmentInterface(this);
 
@@ -77,9 +82,35 @@ public class PositionFragment extends Fragment {
                 .beginTransaction()
                 .replace(R.id.fragment_position_place_holder, mapFragment)
                 .commit();
-       // getChildFragmentManager().findFragmentById(R.id.fragment_position_place_holder);
-        //mMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
 
+        mapFragment.setInterfaceMapStatus(new MapFragment.InterfaceMapStatus() {
+            @Override
+            public void getMapStatus(int i) {
+                if(i == 1){
+                    Toast.makeText(getActivity(),"Maps Ready",Toast.LENGTH_SHORT).show();
+
+                    if(listPositionItems.size() > 0) {
+                        tempLat = listPositionItems.get(0).getLatitud();
+                        tempLng = listPositionItems.get(0).getLongitud();
+                        mapFragment.addMarker(Double.valueOf(tempLat), Double.valueOf(tempLng));
+
+
+                        for (int j = 1; j < listPositionItems.size(); j++) {
+
+                            Double oriLat = Double.valueOf(listPositionItems.get(j - 1).getLatitud());
+                            Double oriLon = Double.valueOf(listPositionItems.get(j - 1).getLongitud());
+                            Double desLat = Double.valueOf(listPositionItems.get(j).getLatitud());
+                            Double desLon = Double.valueOf(listPositionItems.get(j).getLongitud());
+                            ;
+
+                            mapFragment.drawLine(new LatLng(oriLat, oriLon), new LatLng(desLat, desLon));
+                            mapFragment.addMarker(desLat, desLon);
+                            latLng_old = new LatLng(desLat, desLon);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -107,30 +138,29 @@ public class PositionFragment extends Fragment {
         getActivity().unregisterReceiver(getPositionReceiver);
         Log.e("BROADCAST_FRAGM", "UNREGISTER");
     }
-static int recover = 1;
+
+
     public class getPositionReceiver extends BroadcastReceiver {
 
         String broadCLatitude;
         String broadCLongitude;
-
+        int posTime = 0;
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == PositionService.POSITION_ACTION) {
 
-
-                  for (int i = 0; i < listPositionItems.size(); i++) {
-
-                    tempLat = listPositionItems.get(i).getLatitud();
-                    tempLng = listPositionItems.get(i).getLongitud();
-                    mapFragment.addMarker(Double.valueOf(Double.valueOf(tempLat)), Double.valueOf(Double.valueOf(tempLng)));
-                }
-
-
                 broadCLatitude = intent.getStringExtra(PositionService.PROGRESS_LATITUDE);
                 broadCLongitude = intent.getStringExtra(PositionService.PROGRESS_LONGITUDE);
 
+                if(posTime == 0){
+                    mapFragment.moveTo(Double.valueOf(broadCLatitude), Double.valueOf(broadCLongitude), true);
+                    latLng_old = new LatLng(Double.valueOf(broadCLatitude),Double.valueOf(broadCLongitude));
+                    posTime = 1;
+                }
+
                 mapFragment.addMarker(Double.valueOf(broadCLatitude), Double.valueOf(broadCLongitude));
+                mapFragment.drawLine(latLng_old, new LatLng(Double.valueOf(broadCLatitude), Double.valueOf(broadCLongitude)));
 
             }
             Log.e("BROADCAST _CONTENT", "RECEIVED");

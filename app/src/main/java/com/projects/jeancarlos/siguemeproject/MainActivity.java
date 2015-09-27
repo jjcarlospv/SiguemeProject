@@ -2,12 +2,11 @@ package com.projects.jeancarlos.siguemeproject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,7 +14,6 @@ import com.projects.jeancarlos.siguemeproject.database.DataBaseManager;
 import com.projects.jeancarlos.siguemeproject.dialog.CreateRouteDialog;
 import com.projects.jeancarlos.siguemeproject.dialog.EliminateRouteDialog;
 import com.projects.jeancarlos.siguemeproject.fragment.ContentFragment;
-import com.projects.jeancarlos.siguemeproject.fragment.DescriptionMaskFragment;
 import com.projects.jeancarlos.siguemeproject.fragment.NavigationDrawerFragment;
 import com.projects.jeancarlos.siguemeproject.provider.PositionContentProvider;
 import com.projects.jeancarlos.siguemeproject.service.PositionService;
@@ -28,7 +26,7 @@ import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.DrawerFragmentListener {
 
-    public final static String SHARE_PREF_NAME_STATUS = "com.projects.jeancarlos.siguemeproject.main.STATUS";
+    public final static String SHARE_PREF_NAME_STATUS_FRAGMENTS = "com.projects.jeancarlos.siguemeproject.main.STATUS";
     public final static String EXTRA_FRAGMENT_ROUTE = "routeFragment";
     public final static String EXTRA_FRAGMENT_DESCRIPTION = "descriptionFragment";
     public final static String EXTRA_FRAGMENT_OPTIONS = "optionsFragment";
@@ -95,8 +93,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     private void firstOption() {
 
-        String tempNameRoute = getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, PositionService.SHARE_PREF_KEY_ROUTE_NULL);
-        if (tempNameRoute == PositionService.SHARE_PREF_KEY_ROUTE_NULL) {
+        String tempNameRoute = getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(PositionService.SHARE_PREF_KEY_SERV_STATUS, PositionService.SHARE_PREF_KEY_SERV_STOPPED);
+        if (tempNameRoute == PositionService.SHARE_PREF_KEY_SERV_STOPPED) {
             final CreateRouteDialog createRouteDialog = new CreateRouteDialog(MainActivity.this);
             createRouteDialog.show();
             createRouteDialog.setInterfaceDialogRoute(new CreateRouteDialog.InterfaceDialogRoute() {
@@ -120,8 +118,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                         getContentResolver().insert(PositionContentProvider.URI_ROUTE, contentValues);
 
                         getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, nameRoute).commit();
-                        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, FRAGMENT_MASK_DESCRIPTION).commit();
-                        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_OPTIONS).commit();
+                        getSharedPreferences(SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, FRAGMENT_MASK_DESCRIPTION).commit();
+                        getSharedPreferences(SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_OPTIONS).commit();
 
                         contentFragment = new ContentFragment();
                         getFragmentManager().beginTransaction().replace(R.id.activity_main_container, contentFragment).commit();
@@ -137,8 +135,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     private void secondOption(){
 
-        getSharedPreferences(SHARE_PREF_NAME_STATUS,Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION,FRAGMENT_LIST_ROUTES).commit();
-        getSharedPreferences(SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_CLOSE_ROUTES).commit();
+        getSharedPreferences(SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, FRAGMENT_LIST_ROUTES).commit();
+        getSharedPreferences(SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_CLOSE_ROUTES).commit();
 
         contentFragment = new ContentFragment();
         getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
@@ -155,6 +153,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 }
                 if (i == 1) {
                     eliminateRouteDialog.dismiss();
+                    getContentResolver().delete(PositionContentProvider.URI_ROUTE, null, null);
+
+                    getSharedPreferences(SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, FRAGMENT_LIST_ROUTES).commit();
+                    getSharedPreferences(SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, FRAGMENT_CLOSE_ROUTES).commit();
+
+                    contentFragment = new ContentFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.activity_main_container,contentFragment).commit();
                 }
             }
         });

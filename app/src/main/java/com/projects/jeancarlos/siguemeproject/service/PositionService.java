@@ -17,7 +17,6 @@ import com.projects.jeancarlos.siguemeproject.provider.PositionContentProvider;
 import com.projects.jeancarlos.siguemeproject.util.DateUtil;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -60,8 +59,8 @@ public class PositionService extends Service implements LocationListener {
     private static final long MIN_TIME_UPDATE = 1000 * 30;
     private LocationManager locationManager;
 
-    private static final int GET_LOCATION_TIME = 5000;
-    private static final int SAMPLE_TIME = 5000;
+    private static final int GET_LOCATION_TIME = 3000;
+    private static final int SAMPLE_TIME = 10000;
 
     private static boolean status;
 
@@ -75,6 +74,11 @@ public class PositionService extends Service implements LocationListener {
         super.onCreate();
 
         RouteName = getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE).getString(SHARE_PREF_KEY_ROUTE_NAME, SHARE_PREF_KEY_ROUTE_NULL);
+        getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE)
+                .edit().putString(SHARE_PREF_KEY_SERV_STATUS, SHARE_PREF_KEY_SERV_IN_PROGRESS)
+                .commit();
+
+        Log.e("PositionServ", "onCreate");
     }
 
     @Override
@@ -84,16 +88,9 @@ public class PositionService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("onStartCommand", "");
+        Log.e("PositionServ", "onStartCommand");
         init_location = 0;
         startListenerLocation();
-
-        getSharedPreferences(SHARE_PREF_NAME_POSITION_SERVICE, MODE_PRIVATE)
-                .edit().putString(SHARE_PREF_KEY_SERV_STATUS, SHARE_PREF_KEY_SERV_IN_PROGRESS)
-                .commit();
-
-        Log.e("POSITION_SERVICE", "Start");
-
 
         getLocatioHandler = new Handler();
         endServiceRunnable = new Runnable() {
@@ -110,10 +107,10 @@ public class PositionService extends Service implements LocationListener {
         sampleRunnable = new Runnable() {
             @Override
             public void run() {
-                    startListenerLocation();
-                    //sampleHandler.removeCallbacks(sampleRunnable);
-                    Log.e("SampleLoc", "End");
-                    getLocatioHandler.postDelayed(endServiceRunnable, GET_LOCATION_TIME);
+                startListenerLocation();
+                //sampleHandler.removeCallbacks(sampleRunnable);
+                Log.e("SampleLoc", "End");
+                getLocatioHandler.postDelayed(endServiceRunnable, GET_LOCATION_TIME);
             }
         };
 
@@ -135,8 +132,8 @@ public class PositionService extends Service implements LocationListener {
 
         getLocatioHandler.removeCallbacks(endServiceRunnable);
         sampleHandler.removeCallbacks(sampleRunnable);
+        Log.e("PositionServ", "onDestroy");
 
-        Log.e("POSITION_SERVICE", "Stopped");
     }
 
     /**
@@ -153,72 +150,16 @@ public class PositionService extends Service implements LocationListener {
 
     private void stopListenerLocation() {
         locationManager.removeUpdates(PositionService.this);
-
-        //if(locationManager != null)
-        //{locationManager = null;}
     }
-
-    /*private boolean isBetterPosition(Location location, Location lastBestPosition) {
-        if (lastBestPosition == null) {
-            // A new location is always better than no location
-            return true;
-        }
-
-
-        // Check whether the new location fix is newer or older
-        long timeDelta = location.getTime() - lastBestPosition.getTime();
-        boolean isSignificantlyNewer = timeDelta > MIN_TIME_FOR_DISTANCE;
-        boolean isSignificantlyOlder = timeDelta < -MIN_TIME_FOR_DISTANCE;
-        boolean isNewer = timeDelta > 0;
-
-        if (isSignificantlyNewer) {
-            return true;
-            // If the new location is more than two minutes older, it must be worse
-        } else if (isSignificantlyOlder) {
-            return false;
-        }
-
-        // Check whether the new location fix is more or less accurate
-        int accuracyDelta = (int) (location.getAccuracy() - lastBestPosition.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Check if the old and new location are from the same provider
-        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                lastBestPosition.getProvider());
-
-        // Determine location quality using a combination of timeliness and accuracy
-        if (isMoreAccurate) {
-            return true;
-        } else if (isNewer && !isLessAccurate) {
-            return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-            return true;
-        }
-        return false;
-    }
-*/
-
-
-    /**
-     * LocationListener Methods
-     *
-     * @param location
-     */
 
     static int init_location = 0;
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    DecimalFormat decform = new DecimalFormat("##.####");
 
     double latitude_old;
     double latitude;
     double longitude_old;
     double longitude;
 
-    static double temp_lat = 0;
-    static double temp_lng = 0;
-    static int count_loc = 0;
 
     @Override
     public void onLocationChanged(Location location) {
@@ -235,7 +176,7 @@ public class PositionService extends Service implements LocationListener {
             location_old.setLongitude(longitude_old);
 
             init_location = 1;
-            savePosition(location_old);
+            saveNewPosition(location_old);
         } else {
 
             latitude = Math.round(location.getLatitude() * 10000) / 10000.0;
@@ -251,38 +192,41 @@ public class PositionService extends Service implements LocationListener {
                 delta_latitude = delta_latitude * -1;
             }
 
-            if ((delta_longitude > 1.2E-4) || (delta_latitude > 1.2E-4)) //Establecemos un delta referencial
+            if ((delta_longitude >= 1E-4) && (delta_latitude >= 1E-4)) //Establecemos un delta referencial
             {
-                location_old = location;
-                location_old.setLatitude(latitude);
-                location_old.setLongitude(longitude);
-                savePosition(location_old);
+                // Guardamos la posición si es diferente a la posicion anterior
+                if ((location_old.getLatitude() != location.getLatitude()) && (location_old.getLongitude() != location.getLongitude())) {
+                    location_old = location;
+                    location_old.setLatitude(latitude);
+                    location_old.setLongitude(longitude);
+                    saveNewPosition(location_old);
+                }
+
             }
         }
     }
 
-    private void savePosition(Location location) {
+    private void saveNewPosition(Location location){
+        String date = df.format(Calendar.getInstance().getTime());
+        ContentValues contentValues = new ContentValues();
 
-            String date = df.format(Calendar.getInstance().getTime());
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(DataBaseManager.ADDRESS, "");
-            contentValues.put(DataBaseManager.LATITUD, String.valueOf(location.getLatitude()));
-            contentValues.put(DataBaseManager.LONGITUD, String.valueOf(location.getLongitude()));
-            contentValues.put(DataBaseManager.DATE, String.valueOf(DateUtil.getDate(date)));
-            contentValues.put(DataBaseManager.HOUR, String.valueOf(DateUtil.getHour(date)));
-            contentValues.put(DataBaseManager.ID_ROUTE, RouteName);
-            Uri uri = getContentResolver().insert(PositionContentProvider.URI_POSITION, contentValues);
+        contentValues.put(DataBaseManager.ADDRESS, "casa");
+        contentValues.put(DataBaseManager.LATITUD, String.valueOf(location.getLatitude()));
+        contentValues.put(DataBaseManager.LONGITUD, String.valueOf(location.getLongitude()));
+        contentValues.put(DataBaseManager.DATE, String.valueOf(DateUtil.getDate(date)));
+        contentValues.put(DataBaseManager.HOUR, String.valueOf(DateUtil.getHour(date)));
+        contentValues.put(DataBaseManager.ID_ROUTE, RouteName);
+        Uri uri = getContentResolver().insert(PositionContentProvider.URI_POSITION, contentValues);
 
-            Intent intentTestService = new Intent(POSITION_ACTION);
-            intentTestService.putExtra(PROGRESS_LATITUDE, String.valueOf(location.getLatitude()));
-            intentTestService.putExtra(PROGRESS_LONGITUDE, String.valueOf(location.getLongitude()));
-            intentTestService.putExtra(PROGRESS_DATE, String.valueOf(DateUtil.getDate(date)));
-            intentTestService.putExtra(PROGRESS_HOUR, String.valueOf(DateUtil.getHour(date)));
-            intentTestService.putExtra(PROGRESS_ROUTE, RouteName);
-            intentTestService.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);
-            sendBroadcast(intentTestService);
-            Log.e("SAVE_POSITION", String.valueOf(location.getLatitude()) + "//" + String.valueOf(location.getLongitude()));
-
+        Intent intentTestService = new Intent(POSITION_ACTION);
+        intentTestService.putExtra(PROGRESS_LATITUDE, String.valueOf(location.getLatitude()));
+        intentTestService.putExtra(PROGRESS_LONGITUDE, String.valueOf(location.getLongitude()));
+        intentTestService.putExtra(PROGRESS_DATE, String.valueOf(DateUtil.getDate(date)));
+        intentTestService.putExtra(PROGRESS_HOUR, String.valueOf(DateUtil.getHour(date)));
+        intentTestService.putExtra(PROGRESS_ROUTE, RouteName);
+        intentTestService.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);
+        sendBroadcast(intentTestService);
+        Log.e("SAVE_POSITION", String.valueOf(location.getLatitude()) + "//" + String.valueOf(location.getLongitude()));
     }
 
     @Override
@@ -299,5 +243,4 @@ public class PositionService extends Service implements LocationListener {
     public void onProviderDisabled(String s) {
 
     }
-
 }

@@ -27,7 +27,7 @@
         android:name="com.projects.jeancarlos.siguemeproject.fragment.NavigationDrawerFragment"
         android:layout_width="@dimen/activity_main_fragment_width"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
+        android:layout_gravity="start"
         app:layout="@layout/fragment_navigation_drawer"
         tools:layout="@layout/fragment_navigation_drawer" />
 

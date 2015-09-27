@@ -6,7 +6,8 @@
 
 
     <!-- String for Main Activity -->
-    <string name="main_activity_exit_message">¿Desea cancelar el servicio de localización?</string>
+    <string name="main_activity_exit_message">¿Desea salir de la Ruta actual?</string>
+    <string name="main_activity_stop_service">¿Desea cancelar el servicio de localización?</string>
     <string name="main_activity_exit_message_btn_negative">NO</string>
     <string name="main_activity_exit_message_btn_positive">SI</string>
     <string name="main_activity_service_continue">Localizacion Activa</string>
@@ -40,9 +41,10 @@
     <string name="fragment_content_txt_info">LATITUDE // LONGITUDE</string>
 
     <!--String Fragment Options -->
-    <string name="fragment_options_start">INICIAR RUTA</string>
-    <string name="fragment_options_list">VER LISTA</string>
-    <string name="fragment_options_cancel">CANCELAR RUTA</string>
+    <string name="fragment_options_start">INICIAR</string>
+    <string name="fragment_options_list">LISTA</string>
+    <string name="fragment_options_cancel">CANCELAR</string>
+    <string name="fragment_options_exit">SALIR</string>
 
     <!--String Fragment List Route -->
     <string name="fragment_list_routes_title">LISTA DE RUTAS</string>
@@ -53,6 +55,7 @@
     <!-- String for Item Position-->
     <string name="item_position_latitude">LAT: %s</string>
     <string name="item_position_longitude">LNG: %s</string>
+    <string name="item_position_address">AD: %s</string>
     <string name="item_position_date">DATE: %s</string>
     <string name="item_position_hour">HOUR: %s</string>
 
@@ -65,6 +68,7 @@
     <string name="nav_item_new_route">CREAR RUTA</string>
     <string name="nav_item_see_route">VER RUTAS</string>
     <string name="nav_item_erase_route">ELIMINAR RUTA</string>
+    <string name="toolbar_name_menu">Sigueme Project</string>
 
     <string-array name="nav_labels">
         <item>@string/nav_item_new_route</item>

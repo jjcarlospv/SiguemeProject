@@ -132,6 +132,10 @@ public class PositionContentProvider extends ContentProvider {
                     selection = "_id=" + uri.getLastPathSegment();
                     i = dataBaseManager.dataBaseHelper.getWritableDatabase().delete(DataBaseManager.TABLE_NAME_ROUTE,selection,selectionArgs);
                     break;
+
+                case ROUTE:
+                    i = dataBaseManager.dataBaseHelper.getWritableDatabase().delete(DataBaseManager.TABLE_NAME_ROUTE,selection,selectionArgs);
+                    break;
             }
         }
         return i;

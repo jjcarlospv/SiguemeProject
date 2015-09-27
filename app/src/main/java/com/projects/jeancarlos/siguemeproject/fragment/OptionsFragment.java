@@ -19,6 +19,7 @@ public class OptionsFragment extends Fragment implements View.OnClickListener {
     private Button fragment_option_list;
     private Button fragment_option_map;
     private Button fragment_option_cancel;
+    private Button fragment_option_exit;
     private InterfaceOptions interfaceOptions;
 
     @Nullable
@@ -30,6 +31,7 @@ public class OptionsFragment extends Fragment implements View.OnClickListener {
         fragment_option_start = (Button)view.findViewById(R.id.fragment_option_start);
         fragment_option_list = (Button)view.findViewById(R.id.fragment_option_list);
         fragment_option_cancel = (Button)view.findViewById(R.id.fragment_option_cancel);
+        fragment_option_exit = (Button)view.findViewById(R.id.fragment_option_exit);
         return view;
     }
 
@@ -40,6 +42,7 @@ public class OptionsFragment extends Fragment implements View.OnClickListener {
         fragment_option_start.setOnClickListener(this);
         fragment_option_list.setOnClickListener(this);
         fragment_option_cancel.setOnClickListener(this);
+        fragment_option_exit.setOnClickListener(this);
     }
 
     @Override
@@ -54,11 +57,11 @@ public class OptionsFragment extends Fragment implements View.OnClickListener {
                 interfaceOptions.getOption(1);
                 break;
 
-            /*case R.id.fragment_option_pause:
-                interfaceOptions.getOption(2);
-                break;*/
-
             case R.id.fragment_option_cancel:
+                interfaceOptions.getOption(2);
+                break;
+
+            case R.id.fragment_option_exit:
                 interfaceOptions.getOption(3);
                 break;
         }

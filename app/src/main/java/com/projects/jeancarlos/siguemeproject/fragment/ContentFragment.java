@@ -2,13 +2,13 @@ package com.projects.jeancarlos.siguemeproject.fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.IntentService;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +44,10 @@ public class ContentFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.e("ContentFrag", "onActivityCreated");
 
-        fragment_options_Type = getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).getString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_MASK_OPTIONS);
-        fragment_description_Type = getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).getString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_MASK_DESCRIPTION);
+        fragment_options_Type = getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).getString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_MASK_OPTIONS);
+        fragment_description_Type = getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).getString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_MASK_DESCRIPTION);
 
         switch (fragment_description_Type) {
             case MainActivity.FRAGMENT_MASK_DESCRIPTION:
@@ -79,32 +80,32 @@ public class ContentFragment extends Fragment {
     }
 
     private void fragmentMaskDescription() {
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_MASK_DESCRIPTION).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_MASK_DESCRIPTION).commit();
         descriptionMaskFragment = new DescriptionMaskFragment();
         getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, descriptionMaskFragment).commit();
     }
 
     private void fragmentPosition() {
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_POSITION).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_POSITION).commit();
         positionFragment = new PositionFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, positionFragment).commit();
     }
 
     private void fragmentListRoute() {
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_LIST_ROUTES).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_LIST_ROUTES).commit();
         listRoutesFragment = new ListRoutesFragment();
         getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, listRoutesFragment).commit();
     }
 
     private void fragmentListPosition() {
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_LIST_POSITIONS).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_DESCRIPTION, MainActivity.FRAGMENT_LIST_POSITIONS).commit();
         listPositionFragment = new ListPositionFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_description, listPositionFragment).commit();
     }
 
     private void fragmentMaskOption() {
 
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_MASK_OPTIONS).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_MASK_OPTIONS).commit();
 
         optionMaskFragment = new OptionMaskFragment();
         getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_options, optionMaskFragment).commit();
@@ -112,7 +113,7 @@ public class ContentFragment extends Fragment {
 
     private void fragmentOptions() {
 
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_OPTIONS).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_OPTIONS).commit();
 
         optionsFragment = new OptionsFragment();
         getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_options, optionsFragment).commit();
@@ -159,18 +160,13 @@ public class ContentFragment extends Fragment {
                         break;
 
                     case 2:
-
-                        break;
-
-                    case 3:
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setMessage(getResources().getString(R.string.main_activity_exit_message))
+                        builder.setMessage(getResources().getString(R.string.main_activity_stop_service))
                                 .setCancelable(false)
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                         getActivity().stopService(new Intent(getActivity(), PositionService.class));
-                                        getActivity().getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, getActivity().MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, PositionService.SHARE_PREF_KEY_ROUTE_NULL).commit();
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -181,24 +177,59 @@ public class ContentFragment extends Fragment {
                                 });
                         AlertDialog alert = builder.create();
                         alert.show();
+
+                        break;
+
+                    case 3:
+                        AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                        builder2.setMessage(getResources().getString(R.string.main_activity_exit_message))
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                        getActivity().stopService(new Intent(getActivity(), PositionService.class));
+
+                                        getActivity().getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, getActivity().MODE_PRIVATE).edit().putString(PositionService.SHARE_PREF_KEY_ROUTE_NAME, PositionService.SHARE_PREF_KEY_ROUTE_NULL).commit();
+                                        fragmentMaskDescription();
+                                        fragmentMaskOption();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+
+                                    }
+                                });
+                        AlertDialog alert2 = builder2.create();
+                        alert2.show();
                         break;
                 }
             }
         });
     }
 
-    private void fragmentCloseRoutes(){
+    private void fragmentCloseRoutes() {
 
-        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_CLOSE_ROUTES).commit();
+        getActivity().getSharedPreferences(MainActivity.SHARE_PREF_NAME_STATUS_FRAGMENTS, Context.MODE_PRIVATE).edit().putString(MainActivity.EXTRA_FRAGMENT_OPTIONS, MainActivity.FRAGMENT_CLOSE_ROUTES).commit();
 
         closeRoutesFragment = new CloseRoutesFragment();
         getActivity().getFragmentManager().beginTransaction().replace(R.id.fragment_content_container_options, closeRoutesFragment).commit();
         closeRoutesFragment.setInterfaceCloseRoutes(new CloseRoutesFragment.InterfaceCloseRoutes() {
             @Override
             public void closeRoutes(int close) {
-                if(close == 1){
-                    fragmentPosition();
-                    fragmentOptions();
+                if (close == 1) {
+
+                    String tempNameRoute = getActivity().getSharedPreferences(PositionService.SHARE_PREF_NAME_POSITION_SERVICE, getActivity().MODE_PRIVATE).getString(PositionService.SHARE_PREF_KEY_SERV_STATUS, PositionService.SHARE_PREF_KEY_SERV_STOPPED);
+                    if (tempNameRoute == PositionService.SHARE_PREF_KEY_SERV_STOPPED) {
+                        fragmentMaskDescription();
+                        fragmentMaskOption();
+                    }
+                    else
+                    {
+                        fragmentPosition();
+                        fragmentOptions();
+                    }
+
                 }
 
             }

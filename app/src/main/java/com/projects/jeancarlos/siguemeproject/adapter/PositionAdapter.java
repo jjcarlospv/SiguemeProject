@@ -55,6 +55,7 @@ public class PositionAdapter extends BaseAdapter {
             view = layoutInflater.inflate(R.layout.item_position,viewGroup,false);
             holder.latitude = (TextView)view.findViewById(R.id.item_position_latitude);
             holder.longitude = (TextView)view.findViewById(R.id.item_position_longitude);
+            holder.address = (TextView)view.findViewById(R.id.item_position_address);
             holder.date = (TextView)view.findViewById(R.id.item_position_date);
             holder.hour = (TextView)view.findViewById(R.id.item_position_hour);
 
@@ -66,6 +67,7 @@ public class PositionAdapter extends BaseAdapter {
 
         holder.latitude.setText(context.getString(R.string.item_position_latitude,position_dto.getLatitud()));
         holder.longitude.setText(context.getString(R.string.item_position_longitude,position_dto.getLongitud()));
+        holder.address.setText(context.getString(R.string.item_position_address,position_dto.getAddress()));
         holder.date.setText(context.getString(R.string.item_position_date,position_dto.getDate()));
         holder.hour.setText(context.getString(R.string.item_position_hour,position_dto.getHour()));
 
@@ -73,6 +75,7 @@ public class PositionAdapter extends BaseAdapter {
     }
 
     public class Holder{
+        TextView address;
         TextView latitude;
         TextView longitude;
         TextView date;

@@ -1,7 +1,9 @@
 package com.projects.jeancarlos.siguemeproject.fragment;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -12,6 +14,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.projects.jeancarlos.siguemeproject.R;
 
 /**
@@ -22,11 +26,13 @@ public class MapFragment extends com.google.android.gms.maps.MapFragment impleme
     private GoogleMap googleMap;
     private MapFragmentInterface mapFragmentInterface;
     private static boolean currPos = true;
+    private InterfaceMapStatus interfaceMapStatus;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getMapAsync(this);
+        Log.e("MapFragment","onCreate");
     }
 
     @Override
@@ -36,6 +42,10 @@ public class MapFragment extends com.google.android.gms.maps.MapFragment impleme
         googleMap.setMyLocationEnabled(true);
         googleMap.setOnMyLocationButtonClickListener(this);
         googleMap.setOnMyLocationChangeListener(this);
+
+
+        interfaceMapStatus.getMapStatus(1);
+
     }
 
     /*
@@ -84,6 +94,13 @@ public class MapFragment extends com.google.android.gms.maps.MapFragment impleme
         return marker;
     }
 
+    public void drawLine(final LatLng origin, final LatLng destination){
+
+        Polyline line = googleMap.addPolyline(new PolylineOptions().
+                add(origin, destination)
+                .width(10).color(Color.rgb(150, 40, 27)));
+    }
+
     public void setMapFragmentInterface(MapFragmentInterface mapFragmentInterface) {
         this.mapFragmentInterface = mapFragmentInterface;
     }
@@ -93,4 +110,13 @@ public class MapFragment extends com.google.android.gms.maps.MapFragment impleme
         public void onLocationChange(Location location);
 
     }
+
+  public interface InterfaceMapStatus{
+      void getMapStatus(int i);
+  }
+
+    public void setInterfaceMapStatus(InterfaceMapStatus interfaceMapStatus){
+        this.interfaceMapStatus = interfaceMapStatus;
+    }
+
 }
